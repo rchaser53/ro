@@ -42,13 +42,6 @@ fn main() {
     println!("Hello, world!");
 }
 
-#[derive(Deserialize, Debug, PartialEq, Eq)]
-enum X {
-    A,
-    B,
-    C,
-}
-
 #[test]
 fn deserialize_unit_enum() {
     let result = vec![
