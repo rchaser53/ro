@@ -59,9 +59,11 @@ version = "0.1.0"
 dependencies = [
  "dtoa",
  "itoa",
+ "quote",
  "serde",
  "serde_derive",
  "serde_urlencoded",
+ "syn",
  "url",
 ]
 
