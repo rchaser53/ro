@@ -2,6 +2,8 @@
 use std::{thread, time};
 
 use crossbeam_channel::{bounded, Sender};
+use tokio;
+
 fn main() {
     let start = time::Instant::now();
     println!("{:?}", time::Instant::now());
@@ -10,19 +12,25 @@ fn main() {
     let length: u64 = 4;
     for num in 0..length {
         let cloned = s.clone();
-        thread::spawn(move || wait_and_send(cloned, num + 1));
+        thread::spawn(move || {
+            let mut rt = tokio::runtime::Runtime::new().unwrap();
+            let f = wait_and_send(cloned, num + 1);
+            rt.block_on(f);
+        });
     }
 
     for num in r.iter().take(length as usize) {
         println!("{}", num);
-    }
+    }    
 
     println!("{:?}", time::Instant::now() - start);
 }
 
-fn wait_and_send(sender: Sender<u64>, i: u64) {
+async fn wait_and_send(sender: Sender<u64>, i: u64) {
     let val = time::Duration::from_millis(i * 1000);
     thread::sleep(val);
 
-    let _ = sender.send(i);
+    if let Err(err) = sender.send(i) {
+        panic!("{}", err);
+    }
 }
